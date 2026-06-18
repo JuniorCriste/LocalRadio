@@ -4,266 +4,317 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Axis Rádio</title>
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="img/logo.png">
     
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
+            --bg-main: #000000;
+            --bg-sidebar: #121212;
+            --card-bg: #181818;
             --card-hover: #282828;
-            --accent-color: #007bff;
-            --text-color: #ffffff;
-            --text-secondary: #b3b3b3;
+            --spotify-green: #1db954;
+            --text-main: #ffffff;
+            --text-muted: #a7a7a7;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+        /* Força tudo a caber em uma única tela sem rolar */
+        html, body {
             margin: 0;
             padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Circular Sp', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            align-items: center;
+        }
+
+        /* Área principal (Top ao Grid) */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 40px;
+            box-sizing: border-box;
+            justify-content: space-between;
         }
 
         header {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 30px 20px;
-            text-align: center;
+            gap: 15px;
         }
 
         header img {
-            max-width: 120px;
-            height: auto;
-            margin-bottom: 15px;
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
         }
 
         header h1 {
+            font-size: 1.8rem;
             margin: 0;
-            font-size: 2.5rem;
-            letter-spacing: 1px;
+            font-weight: 700;
         }
 
         .status-container {
-            background: var(--card-bg);
-            padding: 15px 30px;
-            border-radius: 30px;
-            margin-bottom: 30px;
             font-size: 1.1rem;
-            font-weight: 500;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            border: 1px solid #333;
-            text-align: center;
-            max-width: 90%;
+            color: var(--spotify-green);
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 24px;
         }
 
+        /* Grid perfeitamente dividido: 3 por linha */
         .grid-radios {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            width: 90%;
-            max-width: 1200px;
-            padding: 20px 0;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 18px;
+            flex: 1;
+            margin: 15px 0;
         }
 
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-            border: 2px solid transparent;
+            transition: background-color 0.3s ease;
             position: relative;
+            box-sizing: border-box;
+            border: 1px solid transparent;
         }
 
         .card:hover {
             background: var(--card-hover);
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
         }
 
         .card.active {
-            border-color: var(--accent-color);
-            background: var(--card-hover);
+            background: #202020;
+            border-color: var(--spotify-green);
         }
 
         .card img {
-            width: 100%;
-            height: 140px;
+            width: 70%;
+            height: 50%;
             object-fit: contain;
-            border-radius: 8px;
-            background: #282828;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 8px 8px rgba(0,0,0,0.5));
         }
 
         .card h3 {
-            margin: 10px 0 5px 0;
-            font-size: 1.1rem;
+            margin: 0;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
-        .card .tecla-atrito {
+        .tecla-atalho {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            color: var(--accent-color);
-            font-weight: bold;
-            padding: 2px 8px;
+            top: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.7);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 2px 7px;
             border-radius: 4px;
-            font-size: 0.9rem;
-            border: 1px solid var(--accent-color);
+            font-weight: bold;
         }
 
-        .controls-container {
-            margin: 40px 0;
+        .card.active .tecla-atalho {
+            color: var(--spotify-green);
+        }
+
+        /* Player de Controle Inferior (Estilo Spotify) */
+        .player-bar {
+            background-color: #121212;
+            height: 90px;
+            width: 100%;
             display: flex;
-            gap: 15px;
             align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+            border-top: 1px solid #282828;
+        }
+
+        .player-left {
+            min-width: 180px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .player-center {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .btn {
-            background: var(--card-bg);
-            color: white;
-            border: 1px solid #444;
-            padding: 12px 24px;
-            font-size: 1rem;
-            border-radius: 8px;
+            background: var(--text-main);
+            color: #000000;
+            border: none;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.2s;
             font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
         }
 
         .btn:hover {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
+            transform: scale(1.04);
+            background-color: #f6f6f6;
         }
 
-        .btn-info {
-            background: #2c3e50;
-            border-color: #34495e;
+        .btn-assistente {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid #727272;
         }
-        .btn-info:hover {
-            background: #34495e;
+
+        .btn-assistente:hover {
+            color: #fff;
+            border-color: #fff;
+            background: transparent;
+        }
+
+        .player-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            justify-content: flex-end;
+        }
+
+        .vol-btn {
+            background: transparent;
+            border: 1px solid #404040;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .vol-btn:hover {
+            border-color: #fff;
         }
 
         #volume-display {
-            font-size: 1rem;
-            font-weight: bold;
-            min-width: 60px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            width: 55px;
             text-align: center;
         }
 
-        footer {
-            margin-top: auto;
-            background: #0a0a0a;
-            width: 100%;
-            padding: 25px 20px;
-            text-align: center;
-            box-sizing: border-box;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            border-top: 1px solid #222;
+        /* Modal / Overlay de Autoplay (Para burlar o bloqueio do navegador com elegância) */
+        .overlay-autoplay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
         }
 
-        footer a {
-            color: var(--accent-color);
-            text-decoration: none;
+        .overlay-autoplay h2 {
+            margin-bottom: 20px;
+            color: #fff;
         }
 
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        footer .instructions {
-            margin-bottom: 10px;
-            font-style: italic;
+        .btn-play-inicial {
+            background-color: var(--spotify-green);
+            color: white;
+            font-size: 1.2rem;
+            padding: 15px 40px;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <img src="img/logo.png" alt="Logo Axis Rádio">
-        <h1>Axis Rádio</h1>
-    </header>
-
-    <div class="status-container" id="status-display">
-        Carregando sistema de rádio... clique na tela para ativar.
+    <!-- Tela de Inicialização Automática (Cumpre a regra de Autoplay do Navegador) -->
+    <div id="autoplay-screen" class="overlay-autoplay" style="display: none;">
+        <h2>Pronto para sintonizar Axis Rádio?</h2>
+        <button class="btn btn-play-inicial" onclick="iniciarSistemaComCache()">▶ OUVIR AGORA</button>
     </div>
 
-    <!-- Grid de Rádios -->
-    <div class="grid-radios">
-        <!-- Rádio 1 -->
-        <div class="card" onclick="sintonizar(1)" id="card-1">
-            <span class="tecla-atrito">1</span>
-            <img src="img/novaonda.png" alt="Rádio Nova Onda FM">
-            <h3>Rádio Nova Onda FM - Nova Venécia</h3>
+    <main>
+        <header>
+            <img src="img/logo.png" alt="Logo">
+            <h1>Axis Rádio</h1>
+            <div class="status-container" id="status-display">Aguardando comando...</div>
+        </header>
+
+        <!-- Grid de Rádios com 3 por linha em 2 linhas fixas -->
+        <div class="grid-radios">
+            <div class="card" onclick="sintonizar(1)" id="card-1">
+                <span class="tecla-atalho">1</span>
+                <img src="img/nomeradio1.png" alt="Rádio 1">
+                <h3>Rádio Nova Onda FM - Nova Venécia</h3>
+            </div>
+            <div class="card" onclick="sintonizar(2)" id="card-2">
+                <span class="tecla-atalho">2</span>
+                <img src="img/nomeradio2.png" alt="Rádio 2">
+                <h3>Rádio Espírito Santo</h3>
+            </div>
+            <div class="card" onclick="sintonizar(3)" id="card-3">
+                <span class="tecla-atalho">3</span>
+                <img src="img/nomeradio3.png" alt="Rádio 3">
+                <h3>Rádio Notícia Transanorte FM - Boa Esperança</h3>
+            </div>
+            <div class="card" onclick="sintonizar(4)" id="card-4">
+                <span class="tecla-atalho">4</span>
+                <img src="img/nomeradio4.png" alt="Rádio 4">
+                <h3>Rádio Sintonia FM - Baixo Guandu</h3>
+            </div>
+            <div class="card" onclick="sintonizar(5)" id="card-5">
+                <span class="tecla-atalho">5</span>
+                <img src="img/nomeradio5.png" alt="Rádio 5">
+                <h3>Rádio Massa FM - Ecoporanga</h3>
+            </div>
+            <div class="card" onclick="sintonizar(6)" id="card-6">
+                <span class="tecla-atalho">6</span>
+                <img src="img/nomeradio6.png" alt="Rádio 6">
+                <h3>Rádio FlashBack FM - São Paulo</h3>
+            </div>
+        </div>
+    </main>
+
+    <!-- Barra Inferior de Controle Estilo Spotify -->
+    <div class="player-bar">
+        <div class="player-left">
+            <span>Axis Rádio - Junior Criste - 2026 - <a href="https://github.com/JuniorCriste" target="_blank" style="color: var(--spotify-green); text-decoration:none;">github.com/JuniorCriste</a></span>
+        </div>
+        
+        <div class="player-center">
+            <button class="btn btn-assistente" onclick="falarDataHoraInfo()">ℹ️ Assistente (7)</button>
         </div>
 
-        <!-- Rádio 2 -->
-        <div class="card" onclick="sintonizar(2)" id="card-2">
-            <span class="tecla-atrito">2</span>
-            <img src="img/espiritosanto.png" alt="Rádio Espírito Santo">
-            <h3>Rádio Espírito Santo</h3>
-        </div>
-
-        <!-- Rádio 3 -->
-        <div class="card" onclick="sintonizar(3)" id="card-3">
-            <span class="tecla-atrito">3</span>
-            <img src="img/noticia.png" alt="Rádio Notícia Transanorte FM">
-            <h3>Rádio Notícia Transanorte FM - Boa Esperança</h3>
-        </div>
-
-        <!-- Rádio 4 -->
-        <div class="card" onclick="sintonizar(4)" id="card-4">
-            <span class="tecla-atrito">4</span>
-            <img src="img/sintonia.png" alt="Rádio Sintonia FM">
-            <h3>Rádio Sintonia FM - Baixo Guandu</h3>
-        </div>
-
-        <!-- Rádio 5 -->
-        <div class="card" onclick="sintonizar(5)" id="card-5">
-            <span class="tecla-atrito">5</span>
-            <img src="img/massa.png" alt="Rádio Massa FM">
-            <h3>Rádio Massa FM - Ecoporanga</h3>
-        </div>
-
-        <!-- Rádio 6 -->
-        <div class="card" onclick="sintonizar(6)" id="card-6">
-            <span class="tecla-atrito">6</span>
-            <img src="img/flashback.png" alt="Rádio FlashBack FM">
-            <h3>Rádio FlashBack FM - São Paulo</h3>
+        <div class="player-right">
+            <button class="vol-btn" onclick="alterarVolume(-0.1)">-</button>
+            <span id="volume-display">Vol: 80%</span>
+            <button class="vol-btn" onclick="alterarVolume(0.1)">+</button>
         </div>
     </div>
 
-    <!-- Controles Inferiores -->
-    <div class="controls-container">
-        <button class="btn btn-info" onclick="falarDataHoraInfo()">ℹ️ Assistente (7)</button>
-        <button class="btn" onclick="alterarVolume(-0.1)">Vol - (-)</button>
-        <span id="volume-display">Vol: 80%</span>
-        <button class="btn" onclick="alterarVolume(0.1)">Vol + (+)</button>
-    </div>
-
-    <!-- Elemento do Player oculto -->
     <audio id="audio-player" style="display:none;"></audio>
 
-    <footer>
-        <div class="instructions">
-            Orientações: Use as teclas de 1 a 6 para sintonizar as rádios. Tecla 7 aciona o assistente de voz. Teclas + e - controlam o volume.
-        </div>
-        <div>
-            Axis Rádio - Junior Criste - 2026 - <a href="https://github.com/JuniorCriste" target="_blank">github.com/JuniorCriste</a>
-        </div>
-    </footer>
-
     <script>
-        // Dicionário de rádios com os respectivos links informados
         const radios = {
             1: { nome: "Rádio Nova Onda FM - Nova Venécia", url: "https://virtues.live:8078/stream" },
             2: { nome: "Rádio Espírito Santo", url: "https://cast4.hoost.com.br:20191/stream" },
@@ -276,43 +327,35 @@
         const player = document.getElementById('audio-player');
         const statusDisplay = document.getElementById('status-display');
         const volumeDisplay = document.getElementById('volume-display');
+        const autoplayScreen = document.getElementById('autoplay-screen');
         let radioAtualId = null;
         let timeoutErro = null;
 
-        // Configuração inicial do volume
-        player.volume = 0.8; 
+        // Recupera o Volume do Cache ou define 80% como padrão
+        let volumeSalvo = localStorage.getItem('axisVolume');
+        player.volume = volumeSalvo !== null ? parseFloat(volumeSalvo) : 0.8;
+        atualizarLayoutVolume();
 
-        // Função para o navegador falar um texto por voz
+        // Função de fala unificada, agora respondendo ao volume geral do player
         function falar(texto, callback) {
-            // Cancela falas anteriores em andamento
             window.speechSynthesis.cancel();
-
             const som = new SpeechSynthesisUtterance(texto);
             som.lang = 'pt-BR';
-            som.rate = 1.1; // Velocidade da fala um pouco mais natural
+            som.rate = 1.1;
+            som.volume = player.volume; // 🎙️ A voz agora obedece o volume do player!
 
-            if (callback) {
-                som.onend = callback;
-            }
+            if (callback) som.onend = callback;
             window.speechSynthesis.speak(som);
         }
 
-        // Função do Botão 7 / Tecla 7 (Data, Hora e Instruções)
         function falarDataHoraInfo() {
             const agora = new Date();
             const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-            const diaSemana = diasSemana[agora.getDay()];
-            const dia = agora.getDate();
             const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            const mes = meses[agora.getMonth()];
-            const ano = agora.getFullYear();
-            const horas = agora.getHours();
-            const minutos = agora.getMinutes();
-
-            const textoDataHora = `Hoje é ${diaSemana}, dia ${dia} de ${mes} de ${ano}. Agora são ${horas} horas e ${minutos} minutos. Escolha de 1 a 6 para sintonizar alguma rádio.`;
+            
+            const textoDataHora = `Hoje é ${diasSemana[agora.getDay()]}, dia ${agora.getDate()} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}. Agora são ${agora.getHours()} horas e ${agora.getMinutes()} minutos. Escolha de 1 a 6 para sintonizar alguma rádio.`;
             
             statusDisplay.innerText = "Assistente falando...";
-            // Pausa a rádio temporariamente para ouvir o assistente se necessário
             const estavaTocando = !player.paused;
             if (estavaTocando) player.pause();
 
@@ -322,115 +365,87 @@
             });
         }
 
-        // Função para sintonizar uma rádio
         function sintonizar(id, automatico = false) {
             if (!radios[id]) return;
-            
-            // Limpa qualquer monitoramento de erro anterior
             clearTimeout(timeoutErro);
 
             radioAtualId = id;
             const radio = radios[id];
             
-            // Salva no LocalStorage para lembrar da próxima vez
             localStorage.setItem('ultimaRadioSintonizada', id);
 
-            // Atualiza o visual dos cards
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             document.getElementById(`card-${id}`).classList.add('active');
 
-            // Define o texto que a voz vai dizer
-            let textoFala = "";
-            if (automatico) {
-                textoFala = `Você está ouvindo ${radio.nome}`;
-            } else {
-                textoFala = `Sintonizando a rádio ${radio.nome}`;
-            }
-
+            let textoFala = automatico ? `Você está ouvindo ${radio.nome}` : `Sintonizando a  ${radio.nome}`;
             statusDisplay.innerText = `Sintonizando: ${radio.nome}...`;
             player.pause();
 
-            // Fala o texto e depois inicia o áudio
             falar(textoFala, () => {
                 player.src = radio.url;
-                statusDisplay.innerText = `Conectando a ${radio.nome}...`;
+                statusDisplay.innerText = `Conectando...`;
                 
                 player.play()
                     .then(() => {
-                        statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
-                        
-                        // Configura um verificador: se passar 8 segundos e o áudio parar sem motivo ou congelar, aciona erro
+                        statusDisplay.innerText = `🟢 Tocando agora: ${radio.nome}`;
                         timeoutErro = setTimeout(() => {
-                            if (player.paused || player.currentTime === 0) {
-                                dispararErroRadio(radio.nome);
-                            }
+                            if (player.paused || player.currentTime === 0) dispararErroRadio(radio.nome);
                         }, 8000);
                     })
-                    .catch(erro => {
-                        console.error(erro);
-                        dispararErroRadio(radio.nome);
-                    });
+                    .catch(() => dispararErroRadio(radio.nome));
             });
         }
 
-        // Função caso o link dê erro ou esteja offline
         function dispararErroRadio(nomeRadio) {
             player.pause();
-            const mensagemErro = `A rádio ${nomeRadio} está fora do ar, tente novamente em outro horário.`;
-            statusDisplay.innerText = `Erro: ${nomeRadio} está offline.`;
-            falar(mensagemErro);
+            statusDisplay.innerText = `🔴 ${nomeRadio} está fora do ar.`;
+            falar(`A rádio ${nomeRadio} está fora do ar, tente novamente em outro horário.`);
         }
 
-        // Função para alterar o volume
         function alterarVolume(quantidade) {
             let novoVolume = player.volume + quantidade;
             if (novoVolume > 1) novoVolume = 1;
             if (novoVolume < 0) novoVolume = 0;
             
             player.volume = novoVolume;
-            volumeDisplay.innerText = `Vol: ${Math.round(novoVolume * 100)}%`;
+            localStorage.setItem('axisVolume', novoVolume); // Salva volume no cache
+            atualizarLayoutVolume();
         }
 
-        // Ouvinte do Teclado (Números, Sinais de + e -)
+        function atualizarLayoutVolume() {
+            volumeDisplay.innerText = `Vol: ${Math.round(player.volume * 100)}%`;
+        }
+
+        // Atalhos de teclado
         document.addEventListener('keydown', (event) => {
             const tecla = event.key;
-
-            if (tecla >= '1' && tecla <= '6') {
-                sintonizar(parseInt(tecla));
-            } else if (tecla === '7') {
-                falarDataHoraInfo();
-            } else if (tecla === '+' || tecla === '=') { // Verifica '=' caso o shift não seja pressionado no teclado padrão
-                alterarVolume(0.1);
-            } else if (tecla === '-') {
-                alterarVolume(-0.1);
-            }
+            if (tecla >= '1' && tecla <= '6') sintonizar(parseInt(tecla));
+            else if (tecla === '7') falarDataHoraInfo();
+            else if (tecla === '+' || tecla === '=') alterarVolume(0.1);
+            else if (tecla === '-') window.alterarVolume ? alterarVolume(-0.1) : alterarVolume(-0.1);
         });
 
-        // Eventos nativos do player para capturar quedas de conexão abruptas
         player.addEventListener('error', () => {
-            if (radioAtualId) {
-                dispararErroRadio(radios[radioAtualId].nome);
-            }
+            if (radioAtualId) dispararErroRadio(radios[radioAtualId].nome);
         });
 
-        // Tenta iniciar automaticamente ao carregar a página
+        // Controle Inteligente de Cache ao Carregar a Página
         window.addEventListener('DOMContentLoaded', () => {
             const ultimaRadio = localStorage.getItem('ultimaRadioSintonizada');
             
             if (ultimaRadio && radios[ultimaRadio]) {
-                statusDisplay.innerText = "Clique em qualquer lugar da tela para iniciar a última rádio gravada.";
-                
-                // Os navegadores modernos bloqueiam áudio automático sem interação prévia do usuário.
-                // Esta função aguarda o primeiro clique do usuário na tela para dar o play na rádio guardada.
-                const iniciarAposClique = () => {
-                    sintonizar(parseInt(ultimaRadio), true);
-                    document.removeEventListener('click', iniciarAposClique);
-                };
-                document.addEventListener('click', iniciarAposClique);
-            } else {
-                statusDisplay.innerText = "Aguardando comando... Pressione de 1 a 6 ou clique em uma estação.";
+                // Mostra a tela de play obrigatória exigida pelos navegadores
+                autoplayScreen.style.display = 'flex';
             }
         });
+
+        function iniciarSistemaComCache() {
+            autoplayScreen.style.display = 'none';
+            const ultimaRadio = localStorage.getItem('ultimaRadioSintonizada');
+            if (ultimaRadio) {
+                sintonizar(parseInt(ultimaRadio), true);
+            }
+        }
     </script>
 </body>
 </html>
