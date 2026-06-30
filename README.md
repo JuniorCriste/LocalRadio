@@ -42,3 +42,11 @@ LocalRadio/
 ├── app.js         # Core Engine: filas de áudio, handlers e conexões
 ├── img/           # Identidade visual e logos das emissoras
 └── voice/         # Pack de locuções locais em formato .ogg
+''
+---
+
+## 👤 Desenvolvedor
+
+Desenvolvido por **Junior Criste** 🚀  
+Sinta-se à vontade para contribuir, relatar problemas ou dar sugestões no repositório!  
+🔗 **GitHub:** [JuniorCriste](https://github.com/JuniorCriste)
