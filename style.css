@@ -112,7 +112,8 @@ header h1 {
 
 .controls-container {
     margin: 40px 0;
-    display: flex;
+    /*display: flex;*/
+    display: none;
     gap: 15px;
     align-items: center;
 }
