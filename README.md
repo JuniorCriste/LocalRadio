@@ -31,16 +31,6 @@ O **Axis Rádio** é uma aplicação web de alta performance desenvolvida para u
 
 ---
 
-## 🎹 Comandos de Operação (Atalhos)
-
-Esqueça o mouse. Você pode operar todo o painel utilizando apenas o teclado:
-
-* `1` a `7` → Sintoniza instantaneamente a rádio correspondente.
-* `+` ou `=` → Aumenta o volume em **10%** (Inicia padronizado em 100%).
-* `-` → Diminui o volume em **10%**.
-
----
-
 ## 🛠️ Arquitetura do Sistema
 
 O projeto foi inteiramente desacoplado e modularizado para facilitar manutenções futuras:
