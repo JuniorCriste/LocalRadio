@@ -1,4 +1,4 @@
-// Dicionário atualizado de rádios com caminhos dos áudios locais
+// Dicionário de rádios com caminhos dos áudios locais
 const radios = {
     1: { nome: "Rádio Nova Onda FM - Nova Venécia", url: "https://virtues.live:8078/stream", audioNome: "novaonda.ogg" },
     2: { nome: "Rádio Espírito Santo", url: "https://cast4.hoost.com.br:20191/stream", audioNome: "espiritosanto.ogg" },
@@ -18,7 +18,7 @@ let radioAtualId = null;
 let timeoutErro = null;
 let redefinindoSinal = false;
 
-// Configuração inicial de volume em 100% (1.0)
+// Configuração inicial de volume em 100%
 player.volume = 1.0;
 voicePlayer.volume = 1.0;
 
@@ -39,24 +39,38 @@ function executarVozes(listaAudios, callback) {
             };
         })
         .catch(erro => {
-            console.error(`Erro ao reproduzir voz: ${proximoAudio}`, erro);
-            // Se falhar (ex: arquivo ausente), pula para o próximo da fila
-            executarVozes(listaAudios, callback);
+            console.warn(`Autoplay bloqueado ou erro na voz: ${proximoAudio}`, erro);
+            // Se foi bloqueado pelo navegador, joga para o fallback de interação
+            aguardarInteracaoUsuario(() => executarVozes([proximoAudio, ...listaAudios], callback));
         });
+}
+
+// Função de Fallback para navegadores sem permissão de autoplay
+function aguardarInteracaoUsuario(acaoPendente) {
+    statusDisplay.innerText = "Clique em qualquer lugar da tela para iniciar o sistema 📻";
+    
+    const interagir = () => {
+        statusDisplay.innerText = "Iniciando...";
+        acaoPendente();
+        document.removeEventListener('click', interagir);
+        document.removeEventListener('keydown', interagir);
+    };
+
+    document.addEventListener('click', interagir);
+    document.addEventListener('keydown', interagir);
 }
 
 // Função para sintonizar uma rádio
 function sintonizar(id, pularIntroducaoVoz = false) {
     if (!radios[id]) return;
     
-    // Limpa monitores de erros anteriores e estados de retextativa
     clearTimeout(timeoutErro);
     redefinindoSinal = false;
 
     radioAtualId = id;
     const radio = radios[id];
     
-    // Atualiza interface visual (Cards ativos)
+    // Atualiza interface visual
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     const cardElement = document.getElementById(`card-${id}`);
     if (cardElement) cardElement.classList.add('active');
@@ -66,17 +80,15 @@ function sintonizar(id, pularIntroducaoVoz = false) {
     voicePlayer.pause();
 
     if (pularIntroducaoVoz) {
-        // Inicialização direta do streaming
         conectarStreaming(radio);
     } else {
-        // Enfileira: "sintonizando.ogg" e depois o ogg específico da rádio
         executarVozes(['sintonizando.ogg', radio.audioNome], () => {
             conectarStreaming(radio);
         });
     }
 }
 
-// Função que realiza a conexão do link de streaming
+// Conexão do streaming
 function conectarStreaming(radio) {
     player.src = radio.url;
     statusDisplay.innerText = `Conectando a ${radio.nome}...`;
@@ -85,7 +97,6 @@ function conectarStreaming(radio) {
         .then(() => {
             statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
             
-            // Monitor de travamento inicial: Se em 8s não carregar buffer, tenta recuperar sinal
             timeoutErro = setTimeout(() => {
                 if (player.paused || player.currentTime === 0) {
                     tentarRecuperarSinal();
@@ -93,62 +104,59 @@ function conectarStreaming(radio) {
             }, 8000);
         })
         .catch(erro => {
-            console.error(erro);
+            console.error("Erro ao reproduzir streaming:", erro);
             tentarRecuperarSinal();
         });
 }
 
-// Rotina para tentar restabelecer o sinal sem avisar o usuário
+// Recuperação silenciosa de sinal
 function tentarRecuperarSinal() {
     if (!radioAtualId || redefinindoSinal) return;
     
     redefinindoSinal = true;
     const radio = radios[radioAtualId];
-    statusDisplay.innerText = `Sinal instável. Tentando reconectar a ${radio.nome}...`;
+    statusDisplay.innerText = `Sinal instável. Tentando reconectar...`;
     
     player.pause();
     player.src = radio.url;
     
-    // Tenta uma segunda carga limpa do streaming
     player.play()
         .then(() => {
             statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
             redefinindoSinal = false;
         })
         .catch(() => {
-            // Se falhar na segunda vez consecutiva, emite o alerta de sem sinal
             dispararErroRadio();
         });
 }
 
-// Função acionada se a rádio continuar offline após a tentativa de reconexão
 function dispararErroRadio() {
     player.pause();
     redefinindoSinal = false;
-    
     if (radioAtualId) {
         statusDisplay.innerText = `Erro: ${radios[radioAtualId].nome} está offline.`;
     }
-    
     executarVozes(['semsinal.ogg']);
 }
 
-// Função para alterar o volume
+// Alteração de volume
 function alterarVolume(quantidade) {
     let novoVolume = player.volume + quantidade;
     if (novoVolume > 1) novoVolume = 1;
     if (novoVolume < 0) novoVolume = 0;
     
-    player.volume = novoVolume;
-    voicePlayer.volume = novoVolume;
+    player.volume = Number(novoVolume.toFixed(1));
+    voicePlayer.volume = Number(novoVolume.toFixed(1));
     volumeDisplay.innerText = `Vol: ${Math.round(novoVolume * 100)}%`;
 }
 
-// Ouvinte do Teclado (Números de 1 a 7, Sinais de + e -)
+// Ouvinte do Teclado Corrigido (Aceita teclado numérico comum e o NumPad)
 document.addEventListener('keydown', (event) => {
-    const tecla = event.key;
+    // Normaliza as teclas capturadas (ex: "Numpad1" vira "1")
+    const tecla = event.key.replace('Numpad', '');
 
-    if (tecla >= '1' && tecla <= '7') {
+    // Verifica se a tecla pressionada é um número entre 1 e 7
+    if (['1', '2', '3', '4', '5', '6', '7'].includes(tecla)) {
         sintonizar(parseInt(tecla));
     } else if (tecla === '+' || tecla === '=') { 
         alterarVolume(0.1);
@@ -157,16 +165,16 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Captura falhas de conexão abruptas durante a reprodução contínua
+// Captura falhas abruptas durante a reprodução
 player.addEventListener('error', () => {
     tentarRecuperarSinal();
 });
 
-// Inicialização automática voltada para o ambiente Kiosk
+// Inicialização segura para Kiosk e máquinas comuns
 window.addEventListener('DOMContentLoaded', () => {
     statusDisplay.innerText = "Iniciando sistema de rádio...";
     
-    // Executa a sequência: Bem-vindo e logo após sintoniza a rádio 1
+    // Tenta rodar a sequência inicial
     executarVozes(['bemvindo.ogg'], () => {
         sintonizar(1);
     });
