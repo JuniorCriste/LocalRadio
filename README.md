@@ -1,4 +1,4 @@
-# 📻 Axis Rádio `v2.0`
+# 📻 Axis Rádio `v1.0`
 
 > **Sintonize o melhor do rádio capixaba em uma plataforma inteligente, acessível e otimizada para automação contínua.**
 
@@ -8,7 +8,7 @@ O **Axis Rádio** é uma aplicação web de alta performance desenvolvida para u
 
 ---
 
-## 🚀 O que há de novo na v2.0?
+## 🚀 O que há de novo na v1.0?
 
 * 🔇 **Adeus, Sintetizador de Voz:** Toda a interação por voz agora utiliza locuções reais em arquivos de áudio de alta fidelidade (`.ogg`), garantindo compatibilidade uniforme entre navegadores sem depender de engines de terceiros.
 * 🛡️ **Filtro Anti-Bloqueio (Safe Play):** Implementação de um ecossistema inteligente de *fallback*. Se o navegador bloquear o autoplay, o app avisa visualmente e destrava com um único clique ou toque.
