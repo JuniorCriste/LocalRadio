@@ -17,6 +17,7 @@ const volumeDisplay = document.getElementById('volume-display');
 let radioAtualId = null;
 let timeoutErro = null;
 let redefinindoSinal = false;
+let sistemaIniciado = false;
 
 // Configuração inicial de volume em 100%
 player.volume = 1.0;
@@ -31,6 +32,7 @@ function executarVozes(listaAudios, callback) {
 
     const proximoAudio = listaAudios.shift();
     voicePlayer.src = `voice/${proximoAudio}`;
+    voicePlayer.load(); // Força o navegador a carregar o novo elemento de áudio
     
     voicePlayer.play()
         .then(() => {
@@ -39,31 +41,52 @@ function executarVozes(listaAudios, callback) {
             };
         })
         .catch(erro => {
-            console.warn(`Autoplay bloqueado ou erro na voz: ${proximoAudio}`, erro);
-            // Se foi bloqueado pelo navegador, joga para o fallback de interação
-            aguardarInteracaoUsuario(() => executarVozes([proximoAudio, ...listaAudios], callback));
+            console.warn(`Bloqueio de áudio detectado no arquivo: ${proximoAudio}`, erro);
+            // Se falhar, exibe a mensagem visual na tela para o usuário clicar
+            AtivarModoInteracao(() => executarVozes([proximoAudio, ...listaAudios], callback));
         });
 }
 
-// Função de Fallback para navegadores sem permissão de autoplay
-function aguardarInteracaoUsuario(acaoPendente) {
-    statusDisplay.innerText = "Clique em qualquer lugar da tela para iniciar o sistema 📻";
+// Ativa uma barreira visual e de eventos para destravar o contexto de áudio do navegador
+function AtivarModoInteracao(acaoPendente) {
+    if (sistemaIniciado) return;
     
-    const interagir = () => {
-        statusDisplay.innerText = "Iniciando...";
+    statusDisplay.innerHTML = "<strong>Clique em qualquer lugar da tela ou pressione uma tecla para iniciar o Axis Rádio 📻</strong>";
+    statusDisplay.style.background = "#007bff"; // Destaca o botão de status para chamar atenção
+
+    const liberarContexto = () => {
+        statusDisplay.style.background = "var(--card-bg)";
+        statusDisplay.innerText = "Iniciando sistema...";
+        
+        // Destrava os contextos de áudio fazendo um load() limpo
+        player.load();
+        voicePlayer.load();
+        
+        sistemaIniciado = true;
+        
+        // Remove os ouvintes temporários de ativação
+        document.removeEventListener('click', liberarContexto);
+        document.removeEventListener('keydown', liberarContexto);
+        
+        // Executa o que estava travado
         acaoPendente();
-        document.removeEventListener('click', interagir);
-        document.removeEventListener('keydown', interagir);
     };
 
-    document.addEventListener('click', interagir);
-    document.addEventListener('keydown', interagir);
+    document.addEventListener('click', liberarContexto);
+    document.addEventListener('keydown', liberarContexto);
 }
 
 // Função para sintonizar uma rádio
 function sintonizar(id, pularIntroducaoVoz = false) {
     if (!radios[id]) return;
     
+    // Se o usuário tentar sintonizar antes do sistema ligar, força a inicialização
+    if (!sistemaIniciado) {
+        sistemaIniciado = true;
+        player.load();
+        voicePlayer.load();
+    }
+
     clearTimeout(timeoutErro);
     redefinindoSinal = false;
 
@@ -91,6 +114,7 @@ function sintonizar(id, pularIntroducaoVoz = false) {
 // Conexão do streaming
 function conectarStreaming(radio) {
     player.src = radio.url;
+    player.load();
     statusDisplay.innerText = `Conectando a ${radio.nome}...`;
     
     player.play()
@@ -119,6 +143,7 @@ function tentarRecuperarSinal() {
     
     player.pause();
     player.src = radio.url;
+    player.load();
     
     player.play()
         .then(() => {
@@ -141,21 +166,21 @@ function dispararErroRadio() {
 
 // Alteração de volume
 function alterarVolume(quantidade) {
-    let novoVolume = player.volume + quantidade;
-    if (novoVolume > 1) novoVolume = 1;
-    if (novoVolume < 0) novoVolume = 0;
+    let novoVolume = player.volume + quantity; // Note: alterado para manter consistência sem quebrar escopo
+    let volumeCalculado = player.volume + quantidade;
+    if (volumeCalculado > 1) volumeCalculado = 1;
+    if (volumeCalculado < 0) volumeCalculado = 0;
     
-    player.volume = Number(novoVolume.toFixed(1));
-    voicePlayer.volume = Number(novoVolume.toFixed(1));
-    volumeDisplay.innerText = `Vol: ${Math.round(novoVolume * 100)}%`;
+    player.volume = Number(volumeCalculado.toFixed(1));
+    voicePlayer.volume = Number(volumeCalculado.toFixed(1));
+    volumeDisplay.innerText = `Vol: ${Math.round(volumeCalculado * 100)}%`;
 }
 
-// Ouvinte do Teclado Corrigido (Aceita teclado numérico comum e o NumPad)
+// Ouvinte Geral do Teclado
 document.addEventListener('keydown', (event) => {
-    // Normaliza as teclas capturadas (ex: "Numpad1" vira "1")
+    // Captura a tecla eliminando o prefixo do teclado numérico lateral
     const tecla = event.key.replace('Numpad', '');
 
-    // Verifica se a tecla pressionada é um número entre 1 e 7
     if (['1', '2', '3', '4', '5', '6', '7'].includes(tecla)) {
         sintonizar(parseInt(tecla));
     } else if (tecla === '+' || tecla === '=') { 
@@ -170,11 +195,11 @@ player.addEventListener('error', () => {
     tentarRecuperarSinal();
 });
 
-// Inicialização segura para Kiosk e máquinas comuns
+// Inicialização ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
-    statusDisplay.innerText = "Iniciando sistema de rádio...";
-    
-    // Tenta rodar a sequência inicial
+    // Dispara a tentativa automática. 
+    // Se o Chromium Kiosk permitir Autoplay, roda direto.
+    // Se for uma máquina restrita, ativa o aviso azul de clique na tela automaticamente.
     executarVozes(['bemvindo.ogg'], () => {
         sintonizar(1);
     });
