@@ -59,6 +59,9 @@ header h1 {
     width: 90%;
     max-width: 1200px;
     padding: 20px 0;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
 }
 
 .card {
