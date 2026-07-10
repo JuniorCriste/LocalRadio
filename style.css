@@ -1,12 +1,22 @@
 :root {
+    /* Fundo principal do app (Preto profundo do Spotify) */
     --bg-color: #121212;
-    --card-bg: #1e1e1e;
+
+    /* Fundo dos cards e elementos (Cinza escuro elevado) */
+    --card-bg: #181818;
+
+    /* Destaque ao passar o mouse sobre os cards (Cinza mais claro) */
     --card-hover: #282828;
-    --accent-color: #007bff;
+
+    /* O icônico Verde Spotify (usado para botões ativos, badges e foco) */
+    --accent-color: #1ed760;
+
+    /* Texto principal (Branco puro para alta leitura) */
     --text-color: #ffffff;
+
+    /* Texto secundário (Cinza fosco para descrições e subtítulos) */
     --text-secondary: #b3b3b3;
 }
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
@@ -62,6 +72,7 @@ header h1 {
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+    font-weight: <weight>;
 }
 
 .card {
