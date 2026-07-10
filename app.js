@@ -166,7 +166,6 @@ function dispararErroRadio() {
 
 // Alteração de volume
 function alterarVolume(quantidade) {
-    let novoVolume = player.volume + quantity; // Note: alterado para manter consistência sem quebrar escopo
     let volumeCalculado = player.volume + quantidade;
     if (volumeCalculado > 1) volumeCalculado = 1;
     if (volumeCalculado < 0) volumeCalculado = 0;
@@ -176,7 +175,38 @@ function alterarVolume(quantidade) {
     volumeDisplay.innerText = `Vol: ${Math.round(volumeCalculado * 100)}%`;
 }
 
-// Ouvinte Geral do Teclado
+// Nova função para mudar de rádio sequencialmente (com efeito carrossel)
+function mudarRadioSequencial(direcao) {
+    const idsDisponiveis = Object.keys(radios).map(Number); // Obtém [1, 2, 3, 4, 5, 6, 7]
+    
+    // Se nenhuma rádio estiver tocando ainda, começa da primeira
+    if (!radioAtualId) {
+        sintonizar(idsDisponiveis[0]);
+        return;
+    }
+
+    let indiceAtual = idsDisponiveis.indexOf(radioAtualId);
+    let novoIndice;
+
+    if (direcao === 'proxima') {
+        novoIndice = indiceAtual + 1;
+        // Se passou do limite da última, volta para a primeira (índice 0)
+        if (novoIndice >= idsDisponiveis.length) {
+            novoIndice = 0;
+        }
+    } else if (direcao === 'anterior') {
+        novoIndice = indiceAtual - 1;
+        // Se for menor que a primeira, vai para a última rádio da lista
+        if (novoIndice < 0) {
+            novoIndice = idsDisponiveis.length - 1;
+        }
+    }
+
+    const proximoId = idsDisponiveis[novoIndice];
+    sintonizar(proximoId);
+}
+
+// Ouvinte Geral do Teclado (Atualizado)
 document.addEventListener('keydown', (event) => {
     // Captura a tecla eliminando o prefixo do teclado numérico lateral
     const tecla = event.key.replace('Numpad', '');
@@ -187,6 +217,10 @@ document.addEventListener('keydown', (event) => {
         alterarVolume(0.1);
     } else if (tecla === '-') {
         alterarVolume(-0.1);
+    } else if (tecla === 'ArrowRight') { // Seta para a Direita
+        mudarRadioSequencial('proxima');
+    } else if (tecla === 'ArrowLeft') {  // Seta para a Esquerda
+        mudarRadioSequencial('anterior');
     }
 });
 
