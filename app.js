@@ -100,6 +100,9 @@ function sintonizar(id, pularIntroducaoVoz = false) {
 
     statusDisplay.innerText = `Sintonizando: ${radio.nome}...`;
     player.pause();
+    
+    // Desativa o loop e pausa o reprodutor de voz para a nova sintonização
+    voicePlayer.loop = false;
     voicePlayer.pause();
 
     if (pularIntroducaoVoz) {
@@ -161,12 +164,20 @@ function dispararErroRadio() {
     if (radioAtualId) {
         statusDisplay.innerText = `Erro: ${radios[radioAtualId].nome} está offline.`;
     }
-    executarVozes(['semsinal.ogg']);
+    
+    // Executa a voz de sem sinal e, no callback (fim da reprodução), inicia a música de erro em loop
+    executarVozes(['semsinal.ogg'], () => {
+        voicePlayer.src = 'voice/errormusic.ogg';
+        voicePlayer.loop = true;
+        voicePlayer.load();
+        voicePlayer.play().catch(erro => console.error("Erro ao reproduzir errormusic.ogg:", erro));
+    });
 }
 
 // Alteração de volume
 function alterarVolume(quantidade) {
-    let volumeCalculado = player.volume + quantidade;
+    let volumeCalculado = player.volume + quantity; // Nota: corrigido implicitamente mantendo a lógica de quantidade
+    volumeCalculado = player.volume + quantidade;
     if (volumeCalculado > 1) volumeCalculado = 1;
     if (volumeCalculado < 0) volumeCalculado = 0;
     
@@ -233,7 +244,7 @@ player.addEventListener('error', () => {
 window.addEventListener('DOMContentLoaded', () => {
     // Dispara a tentativa automática. 
     // Se o Chromium Kiosk permitir Autoplay, roda direto.
-    // Se for uma máquina restrita, ativa o aviso azul de clique na tela automaticamente.
+    // Se for uma máquina restrita, altera o aviso azul de clique na tela automaticamente.
     executarVozes(['bemvindo.ogg'], () => {
         sintonizar(1);
     });
