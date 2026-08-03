@@ -7,7 +7,8 @@ const radios = {
     5: { nome: "Rádio Massa FM - Ecoporanga", url: "https://radio.saopaulo01.com.br/8226/stream", audioNome: "massa.ogg" },
     6: { nome: "Rádio Jovem Pan FM - Vitória", url: "https://streaming.livespanel.com:21011/jovempanes", audioNome: "jovempan.ogg" },
     7: { nome: "Rádio FlashBack FM - São Paulo", url: "https://cc6.streammaximum.com:20022/stream", audioNome: "flashback.ogg" },
-    8: { nome: "Rádio 100% Capixaba", url: "https://juniorcriste.github.io/radio-100-por-cento-capixaba/", audioNome: "capixaba.ogg", tipo: "iframe" }
+    8: { nome: "Rádio 100% Capixaba", url: "https://juniorcriste.github.io/radio-100-por-cento-capixaba/", audioNome: "capixaba.ogg", tipo: "iframe" },
+    9: { nome: "Nova Onda FM - Aimorés", url: "https://virtues.live:8106/stream", audioNome: "novaondaaimores.ogg" }
 };
 
 const player = document.getElementById('audio-player');
@@ -44,7 +45,6 @@ function executarVozes(listaAudios, callback) {
         })
         .catch(erro => {
             console.warn(`Bloqueio de áudio detectado no arquivo: ${proximoAudio}`, erro);
-            // Se falhar, exibe a mensagem visual na tela para o usuário clicar
             AtivarModoInteracao(() => executarVozes([proximoAudio, ...listaAudios], callback));
         });
 }
@@ -54,23 +54,20 @@ function AtivarModoInteracao(acaoPendente) {
     if (sistemaIniciado) return;
     
     statusDisplay.innerHTML = "<strong>Clique em qualquer lugar da tela ou pressione uma tecla para iniciar o Axis Rádio 📻</strong>";
-    statusDisplay.style.background = "#007bff"; // Destaca o botão de status para chamar atenção
+    statusDisplay.style.background = "#007bff";
 
     const liberarContexto = () => {
         statusDisplay.style.background = "var(--card-bg)";
         statusDisplay.innerText = "Iniciando sistema...";
         
-        // Destrava os contextos de áudio fazendo um load() limpo
         player.load();
         voicePlayer.load();
         
         sistemaIniciado = true;
         
-        // Remove os ouvintes temporários de ativação
         document.removeEventListener('click', liberarContexto);
         document.removeEventListener('keydown', liberarContexto);
         
-        // Executa o que estava travado
         acaoPendente();
     };
 
@@ -82,7 +79,6 @@ function AtivarModoInteracao(acaoPendente) {
 function sintonizar(id, pularIntroducaoVoz = false) {
     if (!radios[id]) return;
     
-    // Se o usuário tentar sintonizar antes do sistema ligar, força a inicialização
     if (!sistemaIniciado) {
         sistemaIniciado = true;
         player.load();
@@ -110,7 +106,6 @@ function sintonizar(id, pularIntroducaoVoz = false) {
     statusDisplay.innerText = `Sintonizando: ${radio.nome}...`;
     player.pause();
     
-    // Desativa o loop e pausa o reprodutor de voz para a nova sintonização
     voicePlayer.loop = false;
     voicePlayer.pause();
 
@@ -126,11 +121,9 @@ function sintonizar(id, pularIntroducaoVoz = false) {
 // Conexão do streaming
 function conectarStreaming(radio) {
     if (radio.tipo === "iframe") {
-        // Para o player de áudio nativo comum
         player.pause();
         player.src = "";
 
-        // Define a ação de dar play via postMessage quando o iframe terminar de carregar
         webPlayer.onload = () => {
             setTimeout(() => {
                 if (webPlayer.contentWindow) {
@@ -139,11 +132,9 @@ function conectarStreaming(radio) {
             }, 300);
         };
 
-        // Carrega o player web dentro do iframe oculto
         webPlayer.src = radio.url;
         statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
     } else {
-        // Se sintonizou uma rádio normal, desabilita e limpa o iframe imediatamente
         webPlayer.onload = null;
         webPlayer.src = "about:blank";
 
@@ -175,7 +166,6 @@ function tentarRecuperarSinal() {
     redefinindoSinal = true;
     const radio = radios[radioAtualId];
 
-    // Iframe não utiliza sistema de reconexão nativo por streaming
     if (radio.tipo === "iframe") {
         webPlayer.src = radio.url;
         statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
@@ -206,7 +196,6 @@ function dispararErroRadio() {
         statusDisplay.innerText = `Erro: ${radios[radioAtualId].nome} está offline.`;
     }
     
-    // Executa a voz de sem sinal e, no callback (fim da reprodução), inicia a música de erro em loop
     executarVozes(['semsinal.ogg'], () => {
         voicePlayer.src = 'voice/errormusic.ogg';
         voicePlayer.loop = true;
@@ -228,9 +217,8 @@ function alterarVolume(quantidade) {
 
 // Função para mudar de rádio sequencialmente (com efeito carrossel)
 function mudarRadioSequencial(direcao) {
-    const idsDisponiveis = Object.keys(radios).map(Number); // Obtém [1, 2, 3, 4, 5, 6, 7, 8]
+    const idsDisponiveis = Object.keys(radios).map(Number); // Obtém [1, 2, 3, 4, 5, 6, 7, 8, 9]
     
-    // Se nenhuma rádio estiver tocando ainda, começa da primeira
     if (!radioAtualId) {
         sintonizar(idsDisponiveis[0]);
         return;
@@ -257,18 +245,17 @@ function mudarRadioSequencial(direcao) {
 
 // Ouvinte Geral do Teclado
 document.addEventListener('keydown', (event) => {
-    // Captura a tecla eliminando o prefixo do teclado numérico lateral
     const tecla = event.key.replace('Numpad', '');
 
-    if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(tecla)) {
+    if (['1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(tecla)) {
         sintonizar(parseInt(tecla));
     } else if (tecla === '+' || tecla === '=') { 
         alterarVolume(0.1);
     } else if (tecla === '-') {
         alterarVolume(-0.1);
-    } else if (tecla === 'ArrowRight') { // Seta para a Direita
+    } else if (tecla === 'ArrowRight') {
         mudarRadioSequencial('proxima');
-    } else if (tecla === 'ArrowLeft') {  // Seta para a Esquerda
+    } else if (tecla === 'ArrowLeft') {
         mudarRadioSequencial('anterior');
     }
 });
