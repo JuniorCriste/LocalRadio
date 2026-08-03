@@ -271,23 +271,3 @@ window.addEventListener('DOMContentLoaded', () => {
         sintonizar(1);
     });
 });
-
-// Reprodução do Áudio de Hora Pre-gravado
-function reproduzirAudioHora() {
-    const agora = new Date();
-    const horas24 = agora.getHours();
-    
-    // Converte de formato 24h para 12h (0h e 12h viram 12; 1h e 13h viram 1, etc.)
-    const horaFormatada = (horas24 % 12) === 0 ? 12 : (horas24 % 12);
-    
-    const audioHora = new Audio(`voice/hora/${horaFormatada}.ogg`);
-    audioHora.play().catch(() => console.log(`Erro ao reproduzir o arquivo sounds/hora/${horaFormatada}.ogg`));
-}
-
-// Verificação do Relógio
-setInterval(() => {
-    const agora = new Date();
-    if (agora.getMinutes() === 0 && agora.getSeconds() === 0) {
-        reproduzirAudioHora();
-    }
-}, 1000);
