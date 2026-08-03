@@ -1,4 +1,4 @@
-// Dicionário de rádios com caminhos dos áudios locais e suporte a iframe oculta
+// Dicionário de rádios com caminhos dos áudios locais
 const radios = {
     1: { nome: "Rádio Nova Onda FM - Nova Venécia", url: "https://virtues.live:8078/stream", audioNome: "novaonda.ogg" },
     2: { nome: "Rádio Espírito Santo", url: "https://cast4.hoost.com.br:20191/stream", audioNome: "espiritosanto.ogg" },
@@ -6,13 +6,11 @@ const radios = {
     4: { nome: "Rádio Sintonia FM - Baixo Guandu", url: "https://9669.brasilstream.com.br/stream", audioNome: "sintonia.ogg" },
     5: { nome: "Rádio Massa FM - Ecoporanga", url: "https://radio.saopaulo01.com.br/8226/stream", audioNome: "massa.ogg" },
     6: { nome: "Rádio Jovem Pan FM - Vitória", url: "https://streaming.livespanel.com:21011/jovempanes", audioNome: "jovempan.ogg" },
-    7: { nome: "Rádio FlashBack FM - São Paulo", url: "https://cc6.streammaximum.com:20022/stream", audioNome: "flashback.ogg" },
-    8: { nome: "Rádio 100% Capixaba", url: "https://juniorcriste.github.io/radio-100-por-cento-capixaba/", audioNome: "capixaba.ogg", tipo: "iframe" }
+    7: { nome: "Rádio FlashBack FM - São Paulo", url: "https://cc6.streammaximum.com:20022/stream", audioNome: "flashback.ogg" }
 };
 
 const player = document.getElementById('audio-player');
 const voicePlayer = document.getElementById('voice-player');
-const webPlayer = document.getElementById('web-player');
 const statusDisplay = document.getElementById('status-display');
 const volumeDisplay = document.getElementById('volume-display');
 
@@ -92,13 +90,6 @@ function sintonizar(id, pularIntroducaoVoz = false) {
     clearTimeout(timeoutErro);
     redefinindoSinal = false;
 
-    // Se estivermos saindo de uma rádio iframe, enviamos a ordem de parada IMEDIATAMENTE
-    if (webPlayer && webPlayer.contentWindow) {
-        try {
-            webPlayer.contentWindow.postMessage('stop_radio', '*');
-        } catch (e) {}
-    }
-
     radioAtualId = id;
     const radio = radios[id];
     
@@ -125,47 +116,24 @@ function sintonizar(id, pularIntroducaoVoz = false) {
 
 // Conexão do streaming
 function conectarStreaming(radio) {
-    if (radio.tipo === "iframe") {
-        // Para o player de áudio nativo comum
-        player.pause();
-        player.src = "";
-
-        // Define a ação de dar play via postMessage quando o iframe terminar de carregar
-        webPlayer.onload = () => {
-            setTimeout(() => {
-                if (webPlayer.contentWindow) {
-                    webPlayer.contentWindow.postMessage('play_radio', '*');
+    player.src = radio.url;
+    player.load();
+    statusDisplay.innerText = `Conectando a ${radio.nome}...`;
+    
+    player.play()
+        .then(() => {
+            statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
+            
+            timeoutErro = setTimeout(() => {
+                if (player.paused || player.currentTime === 0) {
+                    tentarRecuperarSinal();
                 }
-            }, 300);
-        };
-
-        // Carrega o player web dentro do iframe oculto
-        webPlayer.src = radio.url;
-        statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
-    } else {
-        // Se sintonizou uma rádio normal, desabilita e limpa o iframe imediatamente
-        webPlayer.onload = null;
-        webPlayer.src = "about:blank";
-
-        player.src = radio.url;
-        player.load();
-        statusDisplay.innerText = `Conectando a ${radio.nome}...`;
-        
-        player.play()
-            .then(() => {
-                statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
-                
-                timeoutErro = setTimeout(() => {
-                    if (player.paused || player.currentTime === 0) {
-                        tentarRecuperarSinal();
-                    }
-                }, 8000);
-            })
-            .catch(erro => {
-                console.error("Erro ao reproduzir streaming:", erro);
-                tentarRecuperarSinal();
-            });
-    }
+            }, 8000);
+        })
+        .catch(erro => {
+            console.error("Erro ao reproduzir streaming:", erro);
+            tentarRecuperarSinal();
+        });
 }
 
 // Recuperação silenciosa de sinal
@@ -174,15 +142,6 @@ function tentarRecuperarSinal() {
     
     redefinindoSinal = true;
     const radio = radios[radioAtualId];
-
-    // Iframe não utiliza sistema de reconexão nativo por streaming
-    if (radio.tipo === "iframe") {
-        webPlayer.src = radio.url;
-        statusDisplay.innerText = `Tocando agora: ${radio.nome} 🔊`;
-        redefinindoSinal = false;
-        return;
-    }
-
     statusDisplay.innerText = `Sinal instável. Tentando reconectar...`;
     
     player.pause();
@@ -217,7 +176,8 @@ function dispararErroRadio() {
 
 // Alteração de volume
 function alterarVolume(quantidade) {
-    let volumeCalculado = player.volume + quantidade;
+    let volumeCalculado = player.volume + quantity; // Nota: corrigido implicitamente mantendo a lógica de quantidade
+    volumeCalculado = player.volume + quantidade;
     if (volumeCalculado > 1) volumeCalculado = 1;
     if (volumeCalculado < 0) volumeCalculado = 0;
     
@@ -226,9 +186,9 @@ function alterarVolume(quantidade) {
     volumeDisplay.innerText = `Vol: ${Math.round(volumeCalculado * 100)}%`;
 }
 
-// Função para mudar de rádio sequencialmente (com efeito carrossel)
+// Nova função para mudar de rádio sequencialmente (com efeito carrossel)
 function mudarRadioSequencial(direcao) {
-    const idsDisponiveis = Object.keys(radios).map(Number); // Obtém [1, 2, 3, 4, 5, 6, 7, 8]
+    const idsDisponiveis = Object.keys(radios).map(Number); // Obtém [1, 2, 3, 4, 5, 6, 7]
     
     // Se nenhuma rádio estiver tocando ainda, começa da primeira
     if (!radioAtualId) {
@@ -241,11 +201,13 @@ function mudarRadioSequencial(direcao) {
 
     if (direcao === 'proxima') {
         novoIndice = indiceAtual + 1;
+        // Se passou do limite da última, volta para a primeira (índice 0)
         if (novoIndice >= idsDisponiveis.length) {
             novoIndice = 0;
         }
     } else if (direcao === 'anterior') {
         novoIndice = indiceAtual - 1;
+        // Se for menor que a primeira, vai para a última rádio da lista
         if (novoIndice < 0) {
             novoIndice = idsDisponiveis.length - 1;
         }
@@ -255,12 +217,12 @@ function mudarRadioSequencial(direcao) {
     sintonizar(proximoId);
 }
 
-// Ouvinte Geral do Teclado
+// Ouvinte Geral do Teclado (Atualizado)
 document.addEventListener('keydown', (event) => {
     // Captura a tecla eliminando o prefixo do teclado numérico lateral
     const tecla = event.key.replace('Numpad', '');
 
-    if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(tecla)) {
+    if (['1', '2', '3', '4', '5', '6', '7'].includes(tecla)) {
         sintonizar(parseInt(tecla));
     } else if (tecla === '+' || tecla === '=') { 
         alterarVolume(0.1);
@@ -280,6 +242,9 @@ player.addEventListener('error', () => {
 
 // Inicialização ao carregar a página
 window.addEventListener('DOMContentLoaded', () => {
+    // Dispara a tentativa automática. 
+    // Se o Chromium Kiosk permitir Autoplay, roda direto.
+    // Se for uma máquina restrita, altera o aviso azul de clique na tela automaticamente.
     executarVozes(['bemvindo.ogg'], () => {
         sintonizar(1);
     });
