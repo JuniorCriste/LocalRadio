@@ -1,4 +1,6 @@
-# 📻 Axis Rádio `v1.0`
+# <p align="center"><img src="img/logo.png" alt="Axis Rádio Logo" width="180"></p>
+
+# 📻 Axis Rádio `v1.1`
 
 > **Sintonize o melhor do rádio capixaba em uma plataforma inteligente, acessível e otimizada para automação contínua.**
 
@@ -8,26 +10,41 @@ O **Axis Rádio** é uma aplicação web de alta performance desenvolvida para u
 
 ---
 
-## 🚀 O que há de novo na v1.0?
+## 🚀 O que há de novo?
 
-* 🔇 **Adeus, Sintetizador de Voz:** Toda a interação por voz agora utiliza locuções reais em arquivos de áudio de alta fidelidade (`.ogg`), garantindo compatibilidade uniforme entre navegadores sem depender de engines de terceiros.
+* 🔇 **Adeus, Sintetizador de Voz:** Toda a interação por voz utiliza locuções reais em arquivos de áudio de alta fidelidade (`.ogg`), garantindo compatibilidade uniforme entre navegadores sem depender de engines de terceiros.
 * 🛡️ **Filtro Anti-Bloqueio (Safe Play):** Implementação de um ecossistema inteligente de *fallback*. Se o navegador bloquear o autoplay, o app avisa visualmente e destrava com um único clique ou toque.
+* 🖼️ **Suporte Híbrido (Streaming + Web Player):** Além do player de áudio nativo, o sistema suporta integração via `iframe` com comunicação `postMessage` para web rádios externas.
 * 📶 **Reconexão Silenciosa:** Se o sinal oscilar, o sistema tenta restabelecer o link em segundo plano por até 8 segundos antes de emitir o alerta visual e sonoro de falta de sinal.
-* ⌨️ **Mapeamento Amplo de Teclado:** Integração total com teclados tradicionais e blocos numéricos reduzidos (**NumPads**).
+* ⌨️ **Navegação e Controle por Hardware:** Mapeamento completo para teclas numéricas (1 a 9 / NumPads), navegação sequencial através das setas direcionais (◀ / ▶) e controle de volume (`+` e `-`).
 
 ---
 
 ## 🎛️ Estações Pré-Configuradas
 
-| Slot | Emissora | Região/Foco |
-| :---: | :--- | :--- |
-| **1** | 📻 Rádio Nova Onda FM | Nova Venécia / ES |
-| **2** | 🏛️ Rádio Espírito Santo | Vitória / ES (Governo) |
-| **3** | 📰 Rádio Notícia FM Transanorte | Boa Esperança / ES |
-| **4** | 🎵 Rádio Sintonia FM | Baixo Guandu / ES |
-| **5** | 🚜 Rádio Massa FM | Ecoporanga / ES |
-| **6** | ⚡ Rádio Jovem Pan FM | Vitória / ES |
-| **7** | 📼 Rádio FlashBack FM | São Paulo / SP |
+| Slot | Emissora | Região/Foco | Tipo |
+| :---: | :--- | :--- | :---: |
+| **1** | 📻 Rádio Nova Onda FM | Nova Venécia / ES | Direct Stream |
+| **2** | 🏛️ Rádio Espírito Santo | Vitória / ES (Governo) | Direct Stream |
+| **3** | 📰 Rádio Notícia Transanorte FM | Boa Esperança / ES | Direct Stream |
+| **4** | 🎵 Rádio Sintonia FM | Baixo Guandu / ES | Direct Stream |
+| **5** | 🚜 Rádio Massa FM | Ecoporanga / ES | Direct Stream |
+| **6** | ⚡ Rádio Jovem Pan FM | Vitória / ES | Direct Stream |
+| **7** | 📼 Rádio FlashBack FM | São Paulo / SP | Direct Stream |
+| **8** | 🎙️ Rádio 100% Capixaba | Espírito Santo | Web Player (Iframe) |
+| **9** | 📻 Nova Onda FM | Aimorés / MG | Direct Stream |
+
+---
+
+## 🕹️ Atalhos de Teclado
+
+| Tecla / Atalho | Função |
+| :--- | :--- |
+| **`1` a `9`** | Sintoniza diretamente a rádio do slot correspondente |
+| **`➔` (Seta Direita)** | Avança para a próxima rádio |
+| **`⬅` (Seta Esquerda)** | Voltar para a rádio anterior |
+| **`+` ou `=`** | Aumenta o volume (+10%) |
+| **`-`** | Diminui o volume (-10%) |
 
 ---
 
@@ -40,9 +57,8 @@ LocalRadio/
 ├── index.html     # Esqueleto estrutural sem scripts embutidos
 ├── style.css      # Customização visual responsiva (Dark Theme)
 ├── app.js         # Core Engine: filas de áudio, handlers e conexões
-├── img/           # Identidade visual e logos das emissoras
+├── img/           # Identidade visual, logo e ícones das emissoras
 └── voice/         # Pack de locuções locais em formato .ogg
-
 ```
 
 ---
@@ -50,5 +66,5 @@ LocalRadio/
 ## 👤 Desenvolvedor
 
 Desenvolvido por **Junior Criste** 🚀  
-Sinta-se à vontade para contribuir, relatar problemas ou dar sugestões no repositório!  
+Sinta-se à vontade para contribuir, relatar problemas ou enviar sugestões no repositório!  
 🔗 **GitHub:** [JuniorCriste](https://github.com/JuniorCriste)
