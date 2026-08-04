@@ -14,7 +14,7 @@ O **Axis Rádio** é uma aplicação web de alta performance desenvolvida para u
 * 🛡️ **Filtro Anti-Bloqueio (Safe Play):** Implementação de um ecossistema inteligente de *fallback*. Se o navegador bloquear o autoplay, o app avisa visualmente e destrava com um único clique ou toque.
 * 🖼️ **Suporte Híbrido (Streaming + Web Player):** Além do player de áudio nativo, o sistema suporta integração via `iframe` com comunicação `postMessage` para web rádios externas.
 * 📶 **Reconexão Silenciosa:** Se o sinal oscilar, o sistema tenta restabelecer o link em segundo plano por até 8 segundos antes de emitir o alerta visual e sonoro de falta de sinal.
-* ⌨️ **Navegação e Controle por Hardware:** Mapeamento completo para teclas numéricas (1 a 9 / NumPads), navegação sequencial através das setas direcionais (◀ / ▶) e controle de volume (`+` e `-`).
+* ⌨️ **Navegação e Controle por Hardware:** Mapeamento completo para teclas numéricas (1 a 9 / NumPads) e navegação sequencial através das setas direcionais (◀ / ▶).
 
 ---
 
