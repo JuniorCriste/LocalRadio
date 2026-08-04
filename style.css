@@ -180,3 +180,8 @@ footer .instructions {
     margin-bottom: 10px;
     font-style: italic;
 }
+
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
