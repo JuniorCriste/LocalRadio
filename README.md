@@ -2,8 +2,6 @@
 
 # Axis Rádio `v1.1`
 
-> **Sintonize o melhor do rádio capixaba em uma plataforma inteligente, acessível e otimizada para automação contínua.**
-
 O **Axis Rádio** é uma aplicação web de alta performance desenvolvida para unificar o streaming das principais estações de rádio do Espírito Santo (e além) em uma interface limpa, rápida e totalmente controlável por hardware. Projetado sob medida para rodar em modo **Kiosk (Chromium)** e telas interativas de automação.
 
 🌐 **Acesse agora mesmo:** [juniorcriste.github.io/LocalRadio/](https://juniorcriste.github.io/LocalRadio/)
