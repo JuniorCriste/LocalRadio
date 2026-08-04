@@ -41,8 +41,7 @@ O **Axis Rádio** é uma aplicação web de alta performance desenvolvida para u
 | **`1` a `9`** | Sintoniza diretamente a rádio do slot correspondente |
 | **`➔` (Seta Direita)** | Avança para a próxima rádio |
 | **`⬅` (Seta Esquerda)** | Voltar para a rádio anterior |
-| **`+` ou `=`** | Aumenta o volume (+10%) |
-| **`-`** | Diminui o volume (-10%) |
+
 
 ---
 
