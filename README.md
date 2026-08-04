@@ -1,6 +1,6 @@
 # <p align="center"><img src="img/logo.png" alt="Axis Rádio Logo" width="180"></p>
 
-# 📻 Axis Rádio `v1.1`
+# Axis Rádio `v1.1`
 
 > **Sintonize o melhor do rádio capixaba em uma plataforma inteligente, acessível e otimizada para automação contínua.**
 
