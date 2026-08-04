@@ -59,7 +59,9 @@ LocalRadio/
 ```
 
 ---
+# <p align="center"><img src="img/print1.png" alt="Axis Rádio Logo" ></p>
 
+---
 ## 👤 Desenvolvedor
 
 Desenvolvido por **Junior Criste** 🚀  
