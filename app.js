@@ -1,4 +1,3 @@
-// Dicionário de rádios com caminhos dos áudios locais e suporte a iframe oculta
 const radios = {
     1: { nome: "Rádio Nova Onda FM - Nova Venécia", url: "https://virtues.live:8078/stream", audioNome: "novaonda.ogg" },
     2: { nome: "Rádio Espírito Santo", url: "https://cast4.hoost.com.br:20191/stream", audioNome: "espiritosanto.ogg" },
@@ -112,7 +111,8 @@ function sintonizar(id, pularIntroducaoVoz = false) {
     if (pularIntroducaoVoz) {
         conectarStreaming(radio);
     } else {
-        executarVozes(['sintonizando.ogg', radio.audioNome], () => {
+        // Alterado aqui: removido o 'sintonizando.ogg' da lista
+        executarVozes([radio.audioNome], () => {
             conectarStreaming(radio);
         });
     }
@@ -217,7 +217,7 @@ function alterarVolume(quantidade) {
 
 // Função para mudar de rádio sequencialmente (com efeito carrossel)
 function mudarRadioSequencial(direcao) {
-    const idsDisponiveis = Object.keys(radios).map(Number); // Obtém [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    const idsDisponiveis = Object.keys(radios).map(Number);
     
     if (!radioAtualId) {
         sintonizar(idsDisponiveis[0]);
