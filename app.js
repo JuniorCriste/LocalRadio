@@ -7,7 +7,7 @@ const radios = {
     5: { nome: "Rádio Massa FM - Ecoporanga", url: "https://radio.saopaulo01.com.br/8226/stream", audioNome: "massa.ogg" },
     6: { nome: "Rádio Jovem Pan FM - Vitória", url: "https://streaming.livespanel.com:21011/jovempanes", audioNome: "jovempan.ogg" },
     7: { nome: "Rádio FlashBack FM - São Paulo", url: "https://cc6.streammaximum.com:20022/stream", audioNome: "flashback.ogg" },
-    8: { nome: "Rádio 100% Capixaba", url: "https://juniorcriste.github.io/radio-100-por-cento-capixaba/", audioNome: "capixaba.ogg", tipo: "iframe" },
+    8: { nome: "Rádio 100% Capixaba", url: "https://juniorcriste.github.io/radio-100-por-cento-capixaba/lite/play.html", audioNome: "capixaba.ogg", tipo: "iframe" },
     9: { nome: "Nova Onda FM - Aimorés", url: "https://virtues.live:8106/stream", audioNome: "novaondaaimores.ogg" }
 };
 
